@@ -59,7 +59,7 @@ function autologs() {
 
 case "$(hostname -s)" in
     login*)
-        echo "On Yale cluster."
+        #echo "On Yale cluster."
         ;;
     maryam)
 	export BASH_SILENCE_DEPRECATION_WARNING=1
