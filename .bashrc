@@ -16,6 +16,7 @@ export PATH
 # export SYSTEMD_PAGER=
 
 # User specific aliases and functions
+alias emacs="emacs -nw"
 alias move_contents='function _move() { local dir=$1; for f in $(ls -A | grep -v $dir); do mv "$f" "$dir"; done; }; _move'
 alias howbig='du -sh {.,}* | sort -hr'
 alias makeref='openssl rand -base64 32'
@@ -55,3 +56,23 @@ function autologs() {
 		sleep 5
     done
 }
+
+case "$(hostname -s)" in
+    login*)
+        echo "On Yale cluster."
+        ;;
+    maryam)
+	export BASH_SILENCE_DEPRECATION_WARNING=1
+	alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+        export EDITOR="cot"
+	export VISUAL="cot"
+	export CONDA_AUTO_ACTIVATE_BASE=false
+        ;;
+    *)
+        echo "[bashrc] On unknown machine."
+        alias sshcluster="ssh mcn26@login2.mccleary.yale.edu"
+        ;;
+esac
+
+revcomp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc' | rev; }
+comp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc';}
