@@ -44,7 +44,9 @@ function autocat() {
 }
 
 
-alias loggrep='grep -r "^\[[^]]\]"'
+function logsort() {
+grep -rh "^\[[^]]\]" "${1:-.}" . | python3 ~/.logsort.py
+}
 
 function autologgrep() {
     if [[ -z "$1" ]]; then
