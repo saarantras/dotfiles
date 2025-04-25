@@ -44,20 +44,14 @@ function autocat() {
 }
 
 
-function logsort() {
+function logs() {
 grep -rh "^\[[^]]\]" "${1:-.}" . | python3 ~/.logsort.py
 }
 
-function autologgrep() {
-    if [[ -z "$1" ]]; then
-	echo "Usage: autologgrep <dirname>"
-        return 1
-    fi
-
-    
+function autologs() {
     while true; do
 		clear
-		loggrep $1
+		logsort
 		sleep 5
     done
 }
