@@ -57,8 +57,8 @@ function autologs() {
     done
 }
 
-case "$(hostname -s)" in
-    login*)
+case "$(hostname)" in
+    *mccleary*)
         #echo "On Yale cluster."
         ;;
     maryam)
