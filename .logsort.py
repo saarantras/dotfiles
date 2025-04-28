@@ -6,5 +6,11 @@ for line in sys.stdin:
         lines.append( (float(m.group(1)), line.strip()) )
     else:
         lines.append( (float(-1), line.strip()) )
+
+#very simple doublet checking
+previous_line=""
+
 for _, line in sorted(lines):
-    print(line)
+    if line != previous_line:
+        print(line)
+    previous_line=line
