@@ -52,7 +52,7 @@ grep -rh "^\[[^]]\]" "${1:-.}" . | python3 ~/.logsort.py
 function autologs() {
     while true; do
 		clear
-		logsort
+		logs
 		sleep 5
     done
 }
