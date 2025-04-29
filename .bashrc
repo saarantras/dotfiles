@@ -52,14 +52,14 @@ grep -rh "^\[[^]]\]" "${1:-.}" . | python3 ~/.logsort.py
 function autologs() {
     while true; do
 		clear
-		logsort
+		logs
 		sleep 5
     done
 }
 
-case "$(hostname -s)" in
-    login*)
-        echo "On Yale cluster."
+case "$(hostname)" in
+    *mccleary*)
+        #echo "On Yale cluster."
         ;;
     maryam*)
 	export BASH_SILENCE_DEPRECATION_WARNING=1
