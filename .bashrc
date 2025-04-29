@@ -61,7 +61,7 @@ case "$(hostname -s)" in
     login*)
         echo "On Yale cluster."
         ;;
-    maryam)
+    maryam*)
 	export BASH_SILENCE_DEPRECATION_WARNING=1
 	alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
         export EDITOR="cot"
