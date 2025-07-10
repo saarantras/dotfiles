@@ -63,11 +63,15 @@ case "$(hostname)" in
         ;;
     maryam*)
 	export BASH_SILENCE_DEPRECATION_WARNING=1
+	alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
 	alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
         export EDITOR="cot"
 	export VISUAL="cot"
 	export CONDA_AUTO_ACTIVATE_BASE=false
+	export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
         ;;
+    scriptorium)
+	alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
     *)
         echo "[bashrc] On unknown machine."
         alias sshcluster="ssh mcn26@login2.mccleary.yale.edu"
