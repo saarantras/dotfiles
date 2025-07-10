@@ -72,6 +72,7 @@ case "$(hostname)" in
         ;;
     scriptorium)
 	alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+	;;
     *)
         echo "[bashrc] On unknown machine."
         alias sshcluster="ssh mcn26@login2.mccleary.yale.edu"
