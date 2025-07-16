@@ -75,6 +75,7 @@ case "$(hostname)" in
         #echo "On Yale cluster."
         ;;
     maryam*)
+	export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
 	    export BASH_SILENCE_DEPRECATION_WARNING=1
         export EDITOR="cot"
 	    export VISUAL="cot"
