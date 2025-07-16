@@ -1,5 +1,9 @@
 # .bashrc
 
+# auto-update dotfiles from my git repo
+cd ~/dotfiles
+bash update.sh
+
 # Source global definitions
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
@@ -22,7 +26,8 @@ alias howbig='du -sh {.,}* | sort -hr'
 alias makeref='openssl rand -base64 32'
 alias tab="cd ~/project/tabula_rasa"
 alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
-
+alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
+alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
 
 function autocat() {
     if [[ -z "$1" ]]; then
@@ -57,27 +62,27 @@ function autologs() {
     done
 }
 
+
+
+revcomp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc' | rev; }
+comp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc';}
+
+#machine-specific aliases
+
 case "$(hostname)" in
     *mccleary*)
         #echo "On Yale cluster."
         ;;
     maryam*)
-	export BASH_SILENCE_DEPRECATION_WARNING=1
-	alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
-	alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+	    export BASH_SILENCE_DEPRECATION_WARNING=1
         export EDITOR="cot"
-	export VISUAL="cot"
-	export CONDA_AUTO_ACTIVATE_BASE=false
-	export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
+	    export VISUAL="cot"
+	    export CONDA_AUTO_ACTIVATE_BASE=false
+	    export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
         ;;
     scriptorium)
-	alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+	
 	;;
-    *)
-        echo "[bashrc] On unknown machine."
-        alias sshcluster="ssh mcn26@login2.mccleary.yale.edu"
-        ;;
 esac
 
-revcomp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc' | rev; }
-comp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc';}
+
