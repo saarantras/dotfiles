@@ -2,7 +2,7 @@
 
 # auto-update dotfiles from my git repo
 cd ~/dotfiles
-bash update.sh
+bash update.sh >/dev/null
 cd - > /dev/null
 
 # Source global definitions
