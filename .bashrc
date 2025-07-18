@@ -3,7 +3,7 @@
 # auto-update dotfiles from my git repo
 cd ~/dotfiles
 bash update.sh
-cd -
+cd - > /dev/null
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
