@@ -30,6 +30,22 @@ alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
 alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
 alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
 
+hr() {
+    if [[ $# -ne 2 ]]; then
+        echo "Usage: convert_to_hours <hours> <minutes>"
+        return 1
+    fi
+
+    local hrs=$1
+    local mins=$2
+
+    # Use bc for floating point arithmetic
+    local total=$(echo "scale=1; $hrs + ($mins / 60)" | bc)
+
+    echo "$total"
+}
+
+
 function autocat() {
     if [[ -z "$1" ]]; then
         echo "Usage: autocat <filename>"
