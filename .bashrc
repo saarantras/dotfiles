@@ -1,5 +1,10 @@
 # .bashrc
 
+# auto-update dotfiles from my git repo
+cd ~/dotfiles
+bash update.sh >/dev/null
+cd - > /dev/null
+
 # Source global definitions
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
@@ -22,6 +27,23 @@ alias howbig='du -sh {.,}* | sort -hr'
 alias makeref='openssl rand -base64 32'
 alias tab="cd ~/project/tabula_rasa"
 alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
+alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
+alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+
+hr() {
+    if [[ $# -ne 2 ]]; then
+        echo "Usage: convert_to_hours <hours> <minutes>"
+        return 1
+    fi
+
+    local hrs=$1
+    local mins=$2
+
+    # Use bc for floating point arithmetic
+    local total=$(echo "scale=1; $hrs + ($mins / 60)" | bc)
+
+    echo "$total"
+}
 
 git config --global push.default current
 
@@ -58,22 +80,29 @@ function autologs() {
     done
 }
 
+
+
+revcomp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc' | rev; }
+comp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc';}
+
+#machine-specific aliases
+
 case "$(hostname)" in
     *mccleary*)
         #echo "On Yale cluster."
         ;;
-    maryam)
-	export BASH_SILENCE_DEPRECATION_WARNING=1
-	alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+    maryam*)
+	export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
+	    export BASH_SILENCE_DEPRECATION_WARNING=1
         export EDITOR="cot"
-	export VISUAL="cot"
-	export CONDA_AUTO_ACTIVATE_BASE=false
+	    export VISUAL="cot"
+	    export CONDA_AUTO_ACTIVATE_BASE=false
+	    export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
+	    export PATH="/opt/homebrew/bin:$PATH"
         ;;
-    *)
-        echo "[bashrc] On unknown machine."
-        alias sshcluster="ssh mcn26@login2.mccleary.yale.edu"
-        ;;
+    scriptorium)
+	
+	;;
 esac
 
-revcomp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc' | rev; }
-comp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc';}
+
