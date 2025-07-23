@@ -23,6 +23,7 @@ alias makeref='openssl rand -base64 32'
 alias tab="cd ~/project/tabula_rasa"
 alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
 
+git config --global push.default current
 
 function autocat() {
     if [[ -z "$1" ]]; then
