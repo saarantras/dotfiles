@@ -29,6 +29,7 @@ alias tab="cd ~/project/tabula_rasa"
 alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
 alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
 alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+alias arraystat="python3 ~/.jobsum.py"
 
 hr() {
     if [[ $# -ne 2 ]]; then
