@@ -47,7 +47,7 @@ hr() {
 }
 
 git config --global push.default current
-git config --global user.email "mackenzie.noon@gmail.com"
+git config --global user.email "mackenziecnoon@gmail.com"
 git config --global user.name "Mackenzie Noon"
 
 function autocat() {
