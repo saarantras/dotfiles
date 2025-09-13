@@ -105,6 +105,8 @@ case "$(hostname)" in
 	    export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 	    export PATH="/opt/homebrew/bin:$PATH"
 	    export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+	    export ANDROID_SDK_ROOT="/Users/mcnoon/Library/Android/sdk"
+	    export ANDROID_HOME="/Users/mcnoon/Library/Android/sdk"
         ;;
     scriptorium)
 	
