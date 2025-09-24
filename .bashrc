@@ -29,6 +29,9 @@ alias tab="cd ~/project/tabula_rasa"
 alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
 alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
 alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+alias arraystat="python3 ~/.jobsum.py"
+alias rot13="tr 'A-Za-z' 'N-ZA-Mn-za-m'"
+alias octave="octave --no-gui"
 
 hr() {
     if [[ $# -ne 2 ]]; then
@@ -46,6 +49,8 @@ hr() {
 }
 
 git config --global push.default current
+git config --global user.email "mackenziecnoon@gmail.com"
+git config --global user.name "Mackenzie Noon"
 
 function autocat() {
     if [[ -z "$1" ]]; then
@@ -99,6 +104,9 @@ case "$(hostname)" in
 	    export CONDA_AUTO_ACTIVATE_BASE=false
 	    export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 	    export PATH="/opt/homebrew/bin:$PATH"
+	    export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+	    export ANDROID_SDK_ROOT="/Users/mcnoon/Library/Android/sdk"
+	    export ANDROID_HOME="/Users/mcnoon/Library/Android/sdk"
         ;;
     scriptorium)
 	
