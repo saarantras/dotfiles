@@ -51,6 +51,7 @@ hr() {
 git config --global push.default current
 git config --global user.email "mackenziecnoon@gmail.com"
 git config --global user.name "Mackenzie Noon"
+alias protectmain="git config branch.main.pushRemote no-push"
 
 function autocat() {
     if [[ -z "$1" ]]; then
@@ -94,6 +95,7 @@ comp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc';}
 
 case "$(hostname)" in
     *mccleary*)
+		export PATH="$PATH:/usr/share/code/bin"
         #echo "On Yale cluster."
         ;;
     maryam*)
