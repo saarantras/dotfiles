@@ -29,6 +29,7 @@ alias tab="cd ~/project/tabula_rasa"
 alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
 alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
 alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
+alias hostinger="ssh root@srv1060410.hstgr.cloud"
 alias arraystat="python3 ~/.jobsum.py"
 alias octave="octave --no-gui"
 
