@@ -31,7 +31,6 @@ alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
 alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
 alias hostinger="ssh root@srv1060410.hstgr.cloud"
 alias arraystat="python3 ~/.jobsum.py"
-alias rot13="tr 'A-Za-z' 'N-ZA-Mn-za-m'"
 alias octave="octave --no-gui"
 
 hr() {
@@ -95,10 +94,13 @@ comp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc';}
 #machine-specific aliases
 
 case "$(hostname)" in
+    rose)
+	alias ilovelinuxwifidrivers="sudo systemctl restart NetworkManager"
+	export PATH="/home/mcnoon/miniconda3/bin:$PATH"
+    ;;
     *mccleary*)
-		export PATH="$PATH:/usr/share/code/bin"
         #echo "On Yale cluster."
-        ;;
+    ;;
     maryam*)
 	export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
 	    export BASH_SILENCE_DEPRECATION_WARNING=1
@@ -107,9 +109,6 @@ case "$(hostname)" in
 	    export CONDA_AUTO_ACTIVATE_BASE=false
 	    export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 	    export PATH="/opt/homebrew/bin:$PATH"
-	    export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
-	    export ANDROID_SDK_ROOT="/Users/mcnoon/Library/Android/sdk"
-	    export ANDROID_HOME="/Users/mcnoon/Library/Android/sdk"
         ;;
     scriptorium)
 	
