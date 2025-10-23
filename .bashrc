@@ -7,8 +7,38 @@ cd - > /dev/null
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-	. /etc/bashrc
+        . /etc/bashrc
 fi
+
+# Enable color prompt and common color-aware aliases if the terminal supports it
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    color_prompt=yes
+else
+    color_prompt=
+fi
+
+if [ -n "$force_color_prompt" ]; then
+    color_prompt=yes
+fi
+
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+if [ "$color_prompt" = yes ]; then
+    PS1='\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '
+else
+    PS1='\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+alias ls='ls --color=auto'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
 
 # User specific environment
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
