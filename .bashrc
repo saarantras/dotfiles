@@ -129,9 +129,14 @@ case "$(hostname)" in
 	export PATH="/home/mcnoon/miniconda3/bin:$PATH"
     ;;
     *mccleary*)
-        #echo "On Yale cluster."
+	umask 002
+
+    #echo "On Yale cluster."
     ;;
-    maryam*)
+    *bouchet*)
+	umask 002
+    ;;
+   maryam*)
 	export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
 	    export BASH_SILENCE_DEPRECATION_WARNING=1
         export EDITOR="cot"
