@@ -56,7 +56,7 @@ alias move_contents='function _move() { local dir=$1; for f in $(ls -A | grep -v
 alias howbig='du -sh {.,}* | sort -hr'
 alias makeref='openssl rand -base64 32'
 alias tab="cd /home/mcn26/project_pi_skr2/mcn26/tabula-rasa"
-alias tabdat="cd /home/mcn26/project_pi_skr2/shared"
+alias tabdat="cd /nfs/roberts/project/pi_skr2/shared/tabula_data"
 alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
 alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
 alias hostinger="ssh root@srv1060410.hstgr.cloud"
