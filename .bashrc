@@ -81,6 +81,7 @@ hr() {
 git config --global push.default current
 git config --global user.email "mackenziecnoon@gmail.com"
 git config --global user.name "Mackenzie Noon"
+git config pull.rebase false
 alias protectmain="git config branch.main.pushRemote no-push"
 
 function autocat() {
