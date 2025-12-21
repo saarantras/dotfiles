@@ -1,0 +1,7 @@
+[user]
+	email = mackenziecnoon@gmail.com
+	name = Mackenzie Noon
+[push]
+	default = current
+[pull]
+	rebase = false
