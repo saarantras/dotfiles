@@ -148,3 +148,24 @@ case "$(hostname)" in
 esac
 
 
+stage() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: stage <file>"
+        return 1
+    fi
+
+    local file="$1"
+    local dest="10.168.233.165:/home/mcnoon/backup_drives/primus/staging"
+
+    if [ ! -f "$file" ]; then
+        echo "Error: '$file' does not exist"
+        return 1
+    fi
+
+    if [[ "$file" == *.gz ]]; then
+        scp "$file" "$dest" && rm -f "$file"
+    else
+        gzip "$file" || return 1
+        scp "${file}.gz" "$dest" && rm -f "${file}.gz"
+    fi
+}
