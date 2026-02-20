@@ -143,7 +143,7 @@ case "$(hostname)" in
 	    export PATH="/opt/homebrew/bin:$PATH"
         ;;
     scriptorium)
-	
+	export PATH="/home/mcnoon/miniconda3/bin:$PATH"
 	;;
 esac
 
