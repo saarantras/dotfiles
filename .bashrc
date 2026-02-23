@@ -83,6 +83,16 @@ hr() {
 
 alias protectmain="git config branch.main.pushRemote no-push"
 
+cancel_all_but() {
+    keep_id="$1"
+    if [ -z "$keep_id" ]; then
+        echo "Usage: cancel_all_but <jobid_to_keep>"
+        return 1
+    fi
+
+    squeue -u "$USER" -h -o "%A" | grep -v "^${keep_id}$" | xargs -r scancel
+}
+
 function autocat() {
     if [[ -z "$1" ]]; then
         echo "Usage: autocat <filename>"
