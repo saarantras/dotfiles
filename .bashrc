@@ -47,6 +47,9 @@ then
 fi
 export PATH
 
+export HISTSIZE=10000
+export HISTFILESIZE=-1
+
 # Uncomment the following line if you don't like systemctl's auto-paging feature:
 # export SYSTEMD_PAGER=
 
