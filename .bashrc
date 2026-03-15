@@ -10,6 +10,9 @@ if [ -f /etc/bashrc ]; then
         . /etc/bashrc
 fi
 
+#scriptorium ip in env var (temporary)
+scriptorium="10.168.233.165"
+
 # Enable color prompt and common color-aware aliases if the terminal supports it
 if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
     color_prompt=yes
