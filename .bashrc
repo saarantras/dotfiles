@@ -60,7 +60,7 @@ export HISTFILESIZE=-1
 alias emacs="emacs -nw"
 alias move_contents='function _move() { local dir=$1; for f in $(ls -A | grep -v $dir); do mv "$f" "$dir"; done; }; _move'
 alias howbig='du -sh {.,}* | sort -hr'
-alias makeref='openssl rand -base64 32'
+alias makeref='openssl rand -hex 32'
 alias tab="cd /home/mcn26/project_pi_skr2/mcn26/tabula-rasa"
 alias bcluster="ssh mcn26@bouchet.ycrc.yale.edu"
 alias cluster="ssh mcn26@login2.mccleary.ycrc.yale.edu"
@@ -159,6 +159,7 @@ case "$(hostname)" in
 	    export CONDA_AUTO_ACTIVATE_BASE=false
 	    export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 	    export PATH="/opt/homebrew/bin:$PATH"
+	    export PATH="/opt/homebrew/share/git-core/contrib/diff-highlight:$PATH"
         ;;
     scriptorium)
 	export PATH="/home/mcnoon/miniconda3/bin:$PATH"
