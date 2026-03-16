@@ -85,6 +85,8 @@ hr() {
 }
 
 alias protectmain="git config branch.main.pushRemote no-push"
+alias gdiff='git diff --word-diff=color'
+alias gshow='git show --word-diff=color'
 
 cancel_all_but() {
     keep_id="$1"
@@ -143,8 +145,7 @@ case "$(hostname)" in
     ;;
     *mccleary*)
 	umask 002
-
-    #echo "On Yale cluster."
+	export PATH="/usr/share/git-core/contrib/diff-highlight:$PATH"
     ;;
     *bouchet*)
 	umask 002

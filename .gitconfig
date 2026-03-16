@@ -5,3 +5,22 @@
 	default = current
 [pull]
 	rebase = false
+[core]
+	pager = diff-highlight | less -FRX
+[diff]
+	colorMoved = default
+	wordRegex = [^[:space:]]
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+[alias]
+	wdiff = diff --word-diff=color
+	sdiff = diff --stat
