@@ -6,7 +6,7 @@
 [pull]
 	rebase = false
 [core]
-	pager = /usr/share/git-core/contrib/diff-highlight | less -FRX
+	pager = (diff-highlight 2>/dev/null || cat) | less -FRX
 [diff]
 	colorMoved = default
 	wordRegex = [^[:space:]]
