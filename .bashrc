@@ -50,6 +50,9 @@ then
 fi
 export PATH
 
+export NTFY_SERVER="${NTFY_SERVER:-https://ntfy.sh}"
+export NTFY_TOPIC="${NTFY_TOPIC:-saarantras}"
+
 export HISTSIZE=10000
 export HISTFILESIZE=-1
 
