@@ -8,3 +8,4 @@ mkdir -p ~/.emacs.d/
 cp init.el ~/.emacs.d/init.el
 
 cp .octaverc ~/.octaverc
+cp .tmux.conf ~/.tmux.conf
