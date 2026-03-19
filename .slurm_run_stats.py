@@ -120,8 +120,7 @@ def subsection(title, width=78):
 
 # ── main ───────────────────────────────────────────────────────────────────────
 directory = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path.cwd()
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-out_path = directory / f"run_stats_{timestamp}.txt"
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # fallback only
 
 slurm_ids, worker_ids = find_job_ids(directory)
 all_ids_ordered = slurm_ids + [w for w in worker_ids if w not in set(slurm_ids)]
@@ -129,6 +128,22 @@ all_ids_ordered = slurm_ids + [w for w in worker_ids if w not in set(slurm_ids)]
 if not all_ids_ordered:
     print("No slurm-*.out/err or worker_*.out files found in:", directory)
     sys.exit(1)
+
+# Use the submit time of the first main job as the timestamp (falls back to now)
+job_timestamp = None
+if slurm_ids:
+    raw = run(["sacct", "-j", slurm_ids[0], "--format=Submit", "--parsable2", "--noheader"])
+    for line in raw.splitlines():
+        line = line.strip().split("|")[0]
+        try:
+            job_timestamp = datetime.strptime(line, "%Y-%m-%dT%H:%M:%S").strftime("%Y%m%d_%H%M%S")
+            break
+        except ValueError:
+            continue
+if job_timestamp is None:
+    job_timestamp = timestamp
+
+out_path = directory / f"run_stats_{job_timestamp}.txt"
 
 print(f"Found {len(slurm_ids)} main job(s), {len(worker_ids)} worker job(s).")
 print(f"Writing report to: {out_path}")
