@@ -17,10 +17,14 @@ cp init.el ~/.emacs.d/init.el
 cp .octaverc ~/.octaverc
 cp .tmux.conf ~/.tmux.conf
 
-mkdir -p ~/.codex/skills
-if command -v rsync >/dev/null 2>&1 && [ -d codex/skills ]; then
+mkdir -p ~/.codex/skills ~/.claude/skills
+if command -v rsync >/dev/null 2>&1 && [ -d skills ]; then
     rsync -a --delete \
         --exclude '.system/' \
         --exclude '.gitkeep' \
-        codex/skills/ ~/.codex/skills/
+        skills/ ~/.codex/skills/
+    rsync -a --delete \
+        --exclude '.system/' \
+        --exclude '.gitkeep' \
+        skills/ ~/.claude/skills/
 fi
