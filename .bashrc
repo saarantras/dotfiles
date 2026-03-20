@@ -28,12 +28,8 @@ case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
 
-if [ "$color_prompt" = yes ]; then
-    PS1='\[\e[01;32m\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '
-else
-    PS1='\u@\h:\w\$ '
-fi
-unset color_prompt force_color_prompt
+# Default host color (green); overridden per host below
+host_color='\e[01;32m'
 
 alias ls='ls --color=auto'
 alias dir='dir --color=auto'
@@ -143,19 +139,23 @@ comp() { echo "$1" | tr 'ATCGatcg' 'TAGCtagc';}
 
 case "$(hostname)" in
     rose)
+	host_color='\e[01;33m'  # yellow
 	alias ilovelinuxwifidrivers="sudo systemctl restart NetworkManager"
 	export PATH="/home/mcnoon/miniconda3/bin:$PATH"
     ;;
     *mccleary*)
+	host_color='\e[01;36m'  # cyan
 	umask 002
 	export PATH="/usr/share/git-core/contrib/diff-highlight:$PATH"
 	alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
     ;;
     *bouchet*)
+	host_color='\e[01;35m'  # magenta
 	umask 002
 	alias tabdat="cd /nfs/roberts/project/pi_skr2/shared/tabula_data"
     ;;
    maryam*)
+	host_color='\e[01;32m'  # green
 	export PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin:$PATH"
 	    export BASH_SILENCE_DEPRECATION_WARNING=1
         export EDITOR="cot"
@@ -166,6 +166,7 @@ case "$(hostname)" in
 	    export PATH="/opt/homebrew/share/git-core/contrib/diff-highlight:$PATH"
         ;;
     scriptorium)
+	host_color='\e[01;31m'  # red
 	export PATH="/home/mcnoon/miniconda3/bin:$PATH"
 	# >>> conda initialize >>>
 	# !! Contents within this block are managed by 'conda init' !!
@@ -183,6 +184,13 @@ case "$(hostname)" in
 	# <<< conda initialize <<<
 	;;
 esac
+
+if [ "$color_prompt" = yes ]; then
+    PS1="\[${host_color}\]\u@\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ "
+else
+    PS1='\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt host_color
 
 
 stage() {
