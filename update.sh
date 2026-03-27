@@ -10,6 +10,10 @@ if [ -f scripts/notify-job.sh ]; then
     cp scripts/notify-job.sh ~/.local/bin/notify-job
     chmod 755 ~/.local/bin/notify-job
 fi
+if [ -f scripts/prio-cost.sh ]; then
+    cp scripts/prio-cost.sh ~/.local/bin/prio-cost
+    chmod 755 ~/.local/bin/prio-cost
+fi
 
 mkdir -p ~/.emacs.d/
 cp init.el ~/.emacs.d/init.el

@@ -36,6 +36,17 @@ Use the hostname to infer whether the user is currently on Bouchet, McCleary, or
 - If the request is underspecified, ask only for the missing job characteristics that materially affect partition choice: runtime, CPU count, memory, GPU type/count, and whether the workload is tightly-coupled MPI.
 - After `sbatch`, it is usually worth waiting briefly, then checking queue state or output files to catch immediate failures such as bad paths, invalid accounts, missing modules, or impossible resource requests.
 
+## Checking Priority Tier spending
+
+The user has a script `prio-cost` installed at `~/.local/bin/prio-cost` (source: `dotfiles/scripts/prio-cost.sh`). Run it when the user asks about Priority Tier costs:
+
+```bash
+prio-cost              # prio_skr2 (default)
+prio-cost prio_other   # different account
+```
+
+This wraps `getusage` and shows monthly SU-hours and dollar charges.
+
 ## References
 
 - Partition and queue tables: [`references/partitions.md`](references/partitions.md)
