@@ -17,6 +17,9 @@ cp init.el ~/.emacs.d/init.el
 cp .octaverc ~/.octaverc
 cp .tmux.conf ~/.tmux.conf
 
+cp AIGUIDE.md ~/.claude/CLAUDE.md
+cp AIGUIDE.md ~/.codex/AGENTS.md
+
 mkdir -p ~/.codex/skills ~/.claude/skills
 if command -v rsync >/dev/null 2>&1 && [ -d skills ]; then
     rsync -a --delete \
