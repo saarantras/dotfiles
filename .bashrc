@@ -215,6 +215,23 @@ stage() {
     fi
 }
 
+jd() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: jd <file>"
+        return 1
+    fi
+
+    local file="$1"
+    local dest="scriptorium:/home/mcnoon/backup_drives/primus/jobgetter"
+
+    if [ ! -f "$file" ]; then
+        echo "Error: '$file' does not exist"
+        return 1
+    fi
+
+    scp "$file" "$dest"
+}
+
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
