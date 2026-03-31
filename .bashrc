@@ -222,7 +222,7 @@ jd() {
     fi
 
     local file="$1"
-    local dest="scriptorium:/home/mcnoon/backup_drives/primus/jobgetter"
+    local dest="${scriptorium}:/home/mcnoon/backup_drives/primus/jobgetter"
 
     if [ ! -f "$file" ]; then
         echo "Error: '$file' does not exist"
