@@ -27,6 +27,16 @@ Use the hostname to infer whether the user is currently on Bouchet, McCleary, or
 6. Prefer cluster-native names and defaults over generic Slurm advice.
 7. After submitting with `sbatch`, wait briefly and check whether the job fails immediately.
 
+## Python / conda environments
+
+On Yale clusters, `conda` is not available by default. Load it with:
+
+```bash
+module load miniconda
+```
+
+After loading, `conda activate <env>` and `conda create` work as expected. This applies to both interactive sessions and sbatch scripts.
+
 ## Yale-specific rules
 
 - Treat `ycga` as a McCleary partition for YCGA-related jobs.
