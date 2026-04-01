@@ -9,18 +9,18 @@ Use this skill for Yale cluster job-submission work.
 
 ## First step
 
-Start by identifying the current host:
+Identify which cluster the user is on:
 
 ```bash
-hostname
+scontrol show config 2>/dev/null | awk '/^ClusterName/{print $3}'
 ```
 
-Use the hostname to infer whether the user is currently on Bouchet, McCleary, or another machine before choosing partitions, paths, or examples. If the hostname is ambiguous, say so and proceed with a cluster-specific assumption only after stating it.
+This works on login nodes and compute nodes alike. `hostname` alone is not reliable because compute node names (e.g. `c01n05`) do not encode the cluster. If `scontrol` is unavailable or returns nothing, ask the user which cluster before proceeding.
 
 ## Workflow
 
 1. Check whether the job is for `sbatch`, `salloc`, or a shell one-liner.
-2. Check the cluster with `hostname` when possible.
+2. Determine the cluster with `scontrol show config | grep ClusterName`.
 3. Choose the partition from the tables in [`references/partitions.md`](references/partitions.md).
 4. Choose the account from [`references/accounts-and-patterns.md`](references/accounts-and-patterns.md).
 5. Write a minimal script with only the resources the job actually needs.
