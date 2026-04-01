@@ -232,6 +232,30 @@ jd() {
     scp "$file" "$dest"
 }
 
+himottle() {
+    local days="${1:-3}"
+    local mem="${2:-8G}"
+    local cpus=1
+    local time="${days}-00:00:00"
+    local cluster
+    cluster="$(scontrol show config 2>/dev/null | awk '/^ClusterName/{print $3}')"
+
+    case "$cluster" in
+        mccleary)
+            echo "Spinning up on McCleary (ycga): ${days}d ${cpus}c ${mem}"
+            srun --pty -p ycga -t "$time" -c "$cpus" --mem="$mem" bash
+            ;;
+        bouchet)
+            echo "Spinning up on Bouchet (priority/prio_skr2): ${days}d ${cpus}c ${mem}"
+            srun --pty -p priority -A prio_skr2 -t "$time" -c "$cpus" --mem="$mem" bash
+            ;;
+        *)
+            echo "himottle: could not determine cluster (scontrol returned '${cluster}')"
+            return 1
+            ;;
+    esac
+}
+
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
