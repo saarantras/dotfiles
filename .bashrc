@@ -241,6 +241,26 @@ himottle() {
     cluster="$(scontrol show config 2>/dev/null | awk '/^ClusterName/{print $3}')"
 
     case "$cluster" in
+        mccleary|bouchet)
+            echo "Spinning up on ${cluster} (week): ${days}d ${cpus}c ${mem}"
+            srun --pty -p week -t "$time" -c "$cpus" --mem="$mem" bash
+            ;;
+        *)
+            echo "himottle: could not determine cluster (scontrol returned '${cluster}')"
+            return 1
+            ;;
+    esac
+}
+
+himottlep() {
+    local days="${1:-3}"
+    local mem="${2:-8G}"
+    local cpus=1
+    local time="${days}-00:00:00"
+    local cluster
+    cluster="$(scontrol show config 2>/dev/null | awk '/^ClusterName/{print $3}')"
+
+    case "$cluster" in
         mccleary)
             echo "Spinning up on McCleary (ycga): ${days}d ${cpus}c ${mem}"
             srun --pty -p ycga -t "$time" -c "$cpus" --mem="$mem" bash
@@ -250,7 +270,7 @@ himottle() {
             srun --pty -p priority -A prio_skr2 -t "$time" -c "$cpus" --mem="$mem" bash
             ;;
         *)
-            echo "himottle: could not determine cluster (scontrol returned '${cluster}')"
+            echo "himottlep: could not determine cluster (scontrol returned '${cluster}')"
             return 1
             ;;
     esac
