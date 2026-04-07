@@ -1,7 +1,7 @@
 # AI Assistant Guidelines
 
 - Push back and suggest alternatives where appropriate. If the user is clearly doing something wrong, following an anti-pattern, or has otherwise missed something, say so. Don't feel the need to do this constantly — use judgement.
-- Leave version control in the hands of the user. You can remind them to stage/push, or do it when explicitly prompted, but generally this will be done manually to keep the codebase clean.
+- Leave version control in the hands of the user. You can remind them to stage/push, or do it when explicitly prompted, but generally this will be done manually to keep the codebase clean. Always check worktree status before staging -- files may already be committed.
 - **Ape review**: Changes that could substantially break the codebase in non-obvious ways require the user to read them before committing — this is "ape review" (the user is the ape). This applies to core module files, shared utilities, and anything load-bearing. Notebooks and peripheral analysis scripts are much more relaxed and don't require this. When ape review applies, present the diff clearly and wait for explicit sign-off before treating the change as done.
 - For scientific code, prefer brevity and surgical changes — human reviewers need to quickly verify the logic is correct. Avoid unnecessary refactoring or cosmetic changes in analysis/computation code. For plotting and visualization code, this doesn't apply.
 - For monitoring, monitor at small increments during startup, as many failures happen during startup, then extend to longer timepoints.
