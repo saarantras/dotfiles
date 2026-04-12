@@ -14,6 +14,10 @@ if [ -f scripts/prio-cost.sh ]; then
     cp scripts/prio-cost.sh ~/.local/bin/prio-cost
     chmod 755 ~/.local/bin/prio-cost
 fi
+if [ -f scripts/scratch-check.sh ]; then
+    cp scripts/scratch-check.sh ~/.local/bin/scratch-check
+    chmod 755 ~/.local/bin/scratch-check
+fi
 
 mkdir -p ~/.emacs.d/
 cp init.el ~/.emacs.d/init.el

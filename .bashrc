@@ -259,3 +259,9 @@ himottle() {
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Scratch expiration MOTD. Guarded by interactive-shell test so scp/rsync
+# sessions (non-interactive) produce no stdout and stay safe.
+if [[ $- == *i* ]] && command -v scratch-check >/dev/null 2>&1; then
+    scratch-check --motd 2>/dev/null
+fi
