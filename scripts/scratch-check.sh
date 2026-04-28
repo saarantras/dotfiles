@@ -19,6 +19,10 @@
 #   SCRATCH_FIND_TIMEOUT    find timeout in seconds (default 300)
 #   SCRATCH_TIME_FIELD      ctime|mtime|atime (default ctime)
 #   SCRATCH_DIRS            colon-separated list of scratch dirs (auto-detected)
+#   SCRATCH_EXCLUDE         colon-separated list of paths to prune from scan
+#                           (in addition to auto-detected conda pkgs/envs dirs
+#                           that happen to live in scratch -- regenerable cache,
+#                           not user data we care about retaining)
 
 set -u
 
@@ -59,6 +63,24 @@ find_scratch_dirs() {
     done | sort -u
 }
 
+find_exclude_dirs() {
+    # Auto-exclude conda's pkgs/envs directories when they live in scratch:
+    # these are regeneratable caches/installs, not user data, and YCRC's
+    # standard setup symlinks ~/.conda/{pkgs,envs} into scratch/project.
+    local p
+    for p in "$HOME/.conda/pkgs" "$HOME/.conda/envs"; do
+        [ -L "$p" ] || continue
+        local real
+        real=$(readlink -f "$p" 2>/dev/null) || continue
+        case "$real" in
+            */scratch/*|*/scratch*) printf '%s\n' "$real" ;;
+        esac
+    done
+    if [ -n "${SCRATCH_EXCLUDE:-}" ]; then
+        printf '%s\n' "$SCRATCH_EXCLUDE" | tr ':' '\n' | awk 'NF'
+    fi
+}
+
 human_size() {
     local bytes="${1:-0}"
     if command -v numfmt >/dev/null 2>&1; then
@@ -75,12 +97,32 @@ scan() {
     mkdir -p "$CACHE_DIR"
     local tmp
     tmp=$(mktemp "$SNAPSHOT.XXXXXX") || return 1
-    local dirs
+    local dirs excludes
     dirs=$(find_scratch_dirs)
+    excludes=$(find_exclude_dirs)
 
     printf '# scratch-check snapshot\n' > "$tmp"
     printf '# scanned: %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" >> "$tmp"
     printf '# time_field: %s\n' "$TIME_FIELD" >> "$tmp"
+    if [ -n "$excludes" ]; then
+        while IFS= read -r e; do
+            [ -n "$e" ] && printf '# excluded: %s\n' "$e" >> "$tmp"
+        done <<< "$excludes"
+    fi
+
+    # Build find prune args: \( -path A -o -path B ... \) -prune -o ...
+    local -a prune_args=()
+    if [ -n "$excludes" ]; then
+        prune_args+=( '(' )
+        local first=1
+        while IFS= read -r e; do
+            [ -z "$e" ] && continue
+            [ $first -eq 1 ] || prune_args+=( -o )
+            prune_args+=( -path "$e" )
+            first=0
+        done <<< "$excludes"
+        prune_args+=( ')' -prune -o )
+    fi
 
     if [ -z "$dirs" ]; then
         printf '# no scratch directories found\n' >> "$tmp"
@@ -88,8 +130,9 @@ scan() {
         while IFS= read -r d; do
             [ -z "$d" ] && continue
             [ -d "$d" ] || continue
-            timeout "$FIND_TIMEOUT" find "$d" -xdev -user "$USER" \
-                -type f -printf "%p\t${PRINTF_TIME}\t%s\n" 2>/dev/null >> "$tmp"
+            timeout "$FIND_TIMEOUT" find "$d" -xdev "${prune_args[@]}" \
+                -user "$USER" -type f \
+                -printf "%p\t${PRINTF_TIME}\t%s\n" 2>/dev/null >> "$tmp"
         done <<< "$dirs"
     fi
     mv "$tmp" "$SNAPSHOT"
