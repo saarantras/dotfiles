@@ -141,7 +141,12 @@ case "$(hostname)" in
     rose)
 	host_color='\e[01;33m'  # yellow
 	alias ilovelinuxwifidrivers="sudo systemctl restart NetworkManager"
-	export PATH="/home/mcnoon/miniconda3/bin:$PATH"
+	# Enable `conda activate` without running `conda init`.
+	if [ -f "/home/mcnoon/miniconda3/etc/profile.d/conda.sh" ]; then
+	    . "/home/mcnoon/miniconda3/etc/profile.d/conda.sh"
+	else
+	    export PATH="/home/mcnoon/miniconda3/bin:$PATH"
+	fi
     ;;
     *mccleary*)
 	host_color='\e[01;36m'  # cyan
