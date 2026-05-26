@@ -58,7 +58,7 @@ humanize() {
 state_long=""; elapsed_s=""; remaining_s=""; exit_code=""; terminal=0
 
 # Try squeue first (active / queued).
-sq=$(squeue -j "$jobid" -h -O 'State:30,Elapsed:30,TimeLeft:30' 2>/dev/null | head -1 || true)
+sq=$(squeue -j "$jobid" -h -O 'State:30,TimeUsed:30,TimeLeft:30' 2>/dev/null | head -1 || true)
 if [[ -n "${sq// }" ]]; then
     read -r state_long elapsed_raw timeleft_raw <<< "$sq"
     elapsed_s=$(parse_time "$elapsed_raw")
