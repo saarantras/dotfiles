@@ -1,4 +1,4 @@
-git pull > /dev/null 2>&1
+git pull > /dev/null
 cp .bashrc ~
 cp .logsort.py ~
 cp .jobsum.py ~

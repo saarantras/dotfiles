@@ -1,9 +1,12 @@
 # .bashrc
 
-# auto-update dotfiles from my git repo
-cd ~/dotfiles
-bash update.sh >/dev/null
-cd - > /dev/null
+# auto-update dotfiles from my git repo (interactive shells only, so scp/rsync
+# sessions stay silent; pull errors still reach stderr on interactive logins)
+if [[ $- == *i* ]]; then
+    cd ~/dotfiles
+    bash update.sh >/dev/null
+    cd - > /dev/null
+fi
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
@@ -141,7 +144,12 @@ case "$(hostname)" in
     rose)
 	host_color='\e[01;33m'  # yellow
 	alias ilovelinuxwifidrivers="sudo systemctl restart NetworkManager"
-	export PATH="/home/mcnoon/miniconda3/bin:$PATH"
+	# Enable `conda activate` without running `conda init`.
+	if [ -f "/home/mcnoon/miniconda3/etc/profile.d/conda.sh" ]; then
+	    . "/home/mcnoon/miniconda3/etc/profile.d/conda.sh"
+	else
+	    export PATH="/home/mcnoon/miniconda3/bin:$PATH"
+	fi
     ;;
     *mccleary*)
 	host_color='\e[01;36m'  # cyan
@@ -230,6 +238,18 @@ jd() {
     fi
 
     scp "$file" "$dest"
+}
+
+claude() {
+    case "$(hostname)" in
+        *mccleary*|*bouchet*)
+            if [ -z "${SLURM_JOB_ID:-}" ]; then
+                echo "claude: refusing to start on cluster login node. Get an allocation first (e.g. 'himottle' or 'srun --pty ...')." >&2
+                return 1
+            fi
+            ;;
+    esac
+    command claude "$@"
 }
 
 himottle() {
