@@ -18,6 +18,10 @@ if [ -f scripts/scratch-check.sh ]; then
     cp scripts/scratch-check.sh ~/.local/bin/scratch-check
     chmod 755 ~/.local/bin/scratch-check
 fi
+if [ -f scripts/job-lindy.sh ]; then
+    cp scripts/job-lindy.sh ~/.local/bin/job-lindy
+    chmod 755 ~/.local/bin/job-lindy
+fi
 
 mkdir -p ~/.emacs.d/
 cp init.el ~/.emacs.d/init.el

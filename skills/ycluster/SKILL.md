@@ -25,7 +25,7 @@ This works on login nodes and compute nodes alike. `hostname` alone is not relia
 4. Choose the account from [`references/accounts-and-patterns.md`](references/accounts-and-patterns.md).
 5. Write a minimal script with only the resources the job actually needs.
 6. Prefer cluster-native names and defaults over generic Slurm advice.
-7. After submitting with `sbatch`, wait briefly and check whether the job fails immediately.
+7. After submitting with `sbatch`, wait briefly and check whether the job fails immediately. For longer-running follow-ups, use the Lindy polling helper (see below) instead of hand-picking sleep intervals.
 
 ## Python / conda environments
 
@@ -45,6 +45,37 @@ After loading, `conda activate <env>` and `conda create` work as expected. This 
 - If the user asks for the "right partition", recommend the smallest suitable partition first, then mention faster or larger alternatives only if warranted.
 - If the request is underspecified, ask only for the missing job characteristics that materially affect partition choice: runtime, CPU count, memory, GPU type/count, and whether the workload is tightly-coupled MPI.
 - After `sbatch`, it is usually worth waiting briefly, then checking queue state or output files to catch immediate failures such as bad paths, invalid accounts, missing modules, or impossible resource requests.
+
+## Polling a running job (Lindy heuristic)
+
+For waits longer than a few seconds, use the `cron` skill (per global guideline) rather than `sleep`. To pick the next-poll interval, do NOT compute it yourself - call `job-lindy <jobid>` (installed at `~/.local/bin/job-lindy`, source: `dotfiles/scripts/job-lindy.sh`). It does all the work and prints `eval`-safe `key="value"` lines.
+
+```bash
+eval "$(job-lindy 12345)"
+echo "$summary"
+# $next_poll_seconds: integer seconds until next check (0 if terminal)
+# $terminal:          "1" if job is finished/failed/cancelled/etc.
+# $state:             short code (PD, R, CD, F, CA, TO, OOM, ...)
+```
+
+Loop logic:
+1. Run `job-lindy $JOBID`, eval the output.
+2. If `$terminal == 1`, stop and report `$summary` plus `.out`/`.err` tail.
+3. Otherwise schedule the next check via cron with delay `$next_poll_seconds`.
+
+The script encodes the schedule (so future edits go in one place):
+
+| Job age | Next poll | Why |
+|---|---|---|
+| PENDING | 15 s | Queue usually drains quickly here |
+| R, <2 min | 30 s | Bad path / account / module - fails fast |
+| R, 2-10 min | 2 min | Early OOM, I/O, module-load failures |
+| R, 10-60 min | 10 min | Settled into compute |
+| R, 1-6 h | 30 min | Stable; spot-check |
+| R, 6+ h | 60 min (cap) | Strong Lindy - likely runs to completion |
+| terminal | 0 | Stop |
+
+While in `R`, the next interval is also capped at `max(remaining_walltime/4, 30s)` so polling doesn't sleep past the job's end.
 
 ## Checking Priority Tier spending
 
