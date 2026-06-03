@@ -22,6 +22,10 @@ if [ -f scripts/job-lindy.sh ]; then
     cp scripts/job-lindy.sh ~/.local/bin/job-lindy
     chmod 755 ~/.local/bin/job-lindy
 fi
+if [ -f scripts/tsv2md.sh ]; then
+    cp scripts/tsv2md.sh ~/.local/bin/tsv2md
+    chmod 755 ~/.local/bin/tsv2md
+fi
 
 mkdir -p ~/.emacs.d/
 cp init.el ~/.emacs.d/init.el
