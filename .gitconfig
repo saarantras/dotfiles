@@ -6,6 +6,7 @@
 [pull]
 	rebase = false
 [core]
+	editor = emacs -nw
 	pager = (diff-highlight 2>/dev/null || cat) | less -FRX
 [diff]
 	colorMoved = default
