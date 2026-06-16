@@ -154,7 +154,6 @@ case "$(hostname)" in
     *mccleary*)
 	host_color='\e[01;36m'  # cyan
 	umask 002
-	export PATH="/usr/share/git-core/contrib/diff-highlight:$PATH"
 	alias tabdat="cd /gpfs/gibbs/pi/reilly/tabula_data"
     ;;
     *bouchet*)
@@ -171,7 +170,6 @@ case "$(hostname)" in
 	    export CONDA_AUTO_ACTIVATE_BASE=false
 	    export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 	    export PATH="/opt/homebrew/bin:$PATH"
-	    export PATH="/opt/homebrew/share/git-core/contrib/diff-highlight:$PATH"
         ;;
     scriptorium)
 	host_color='\e[01;31m'  # red
