@@ -13,9 +13,6 @@ if [ -f /etc/bashrc ]; then
         . /etc/bashrc
 fi
 
-#scriptorium ip in env var (temporary)
-scriptorium="10.168.233.165"
-
 # Enable color prompt and common color-aware aliases if the terminal supports it
 if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
     color_prompt=yes
@@ -206,7 +203,7 @@ stage() {
     fi
 
     local file="$1"
-    local dest="10.168.233.165:/home/mcnoon/backup_drives/primus/staging"
+    local dest="scriptorium:/home/mcnoon/backup_drives/primus/staging"
 
     if [ ! -f "$file" ]; then
         echo "Error: '$file' does not exist"
@@ -228,7 +225,7 @@ jd() {
     fi
 
     local file="$1"
-    local dest="${scriptorium}:/home/mcnoon/backup_drives/primus/jobgetter"
+    local dest="scriptorium:/home/mcnoon/backup_drives/primus/jobgetter"
 
     if [ ! -f "$file" ]; then
         echo "Error: '$file' does not exist"
