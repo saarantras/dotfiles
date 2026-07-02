@@ -26,6 +26,10 @@ if [ -f scripts/tsv2md.sh ]; then
     cp scripts/tsv2md.sh ~/.local/bin/tsv2md
     chmod 755 ~/.local/bin/tsv2md
 fi
+if [ -f scripts/diff-highlight.sh ]; then
+    cp scripts/diff-highlight.sh ~/.local/bin/diff-highlight
+    chmod 755 ~/.local/bin/diff-highlight
+fi
 
 mkdir -p ~/.emacs.d/
 cp init.el ~/.emacs.d/init.el
