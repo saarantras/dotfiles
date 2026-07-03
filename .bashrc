@@ -49,6 +49,13 @@ export PATH
 export NTFY_SERVER="${NTFY_SERVER:-https://ntfy.sh}"
 export NTFY_TOPIC="${NTFY_TOPIC:-saarantras}"
 
+# Disable Claude Code's AFK auto-advance on interactive prompts (AskUserQuestion,
+# etc.). Claude reads CLAUDE_AFK_TIMEOUT_MS as the ms before it stops waiting for
+# an answer and proceeds on its own. 2147483647 (2^31-1) is Node's max setTimeout
+# delay (~24.8 days), so the timer never fires; a larger value overflows and fires
+# immediately, and 0 fires immediately, so this exact value is the way to disable.
+export CLAUDE_AFK_TIMEOUT_MS=2147483647
+
 export HISTSIZE=10000
 export HISTFILESIZE=-1
 
