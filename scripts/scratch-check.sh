@@ -1,5 +1,5 @@
 #!/bin/bash
-# scratch-check: warn about files in scratch nearing Yale's 60-day purge.
+# scratch-check: warn about files in scratch nearing Yale's 30-day purge.
 #
 # Usage:
 #   scratch-check          print summary from snapshot (initial scan if needed)
@@ -14,7 +14,7 @@
 # touching the filesystem. Only --scan walks the tree.
 #
 # Config (env vars):
-#   SCRATCH_WARN_DAYS       warn threshold in days (default 53, purge at 60)
+#   SCRATCH_WARN_DAYS       warn threshold in days (default 23, purge at 30)
 #   SCRATCH_CACHE_AGE_HOURS max snapshot age before background rescan (default 24)
 #   SCRATCH_FIND_TIMEOUT    find timeout in seconds (default 300)
 #   SCRATCH_TIME_FIELD      ctime|mtime|atime (default ctime)
@@ -28,7 +28,7 @@ set -u
 
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}"
 SNAPSHOT="$CACHE_DIR/scratch-check-snapshot"
-WARN_DAYS="${SCRATCH_WARN_DAYS:-53}"
+WARN_DAYS="${SCRATCH_WARN_DAYS:-23}"
 MAX_CACHE_AGE_HOURS="${SCRATCH_CACHE_AGE_HOURS:-24}"
 FIND_TIMEOUT="${SCRATCH_FIND_TIMEOUT:-300}"
 
