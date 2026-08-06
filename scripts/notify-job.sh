@@ -18,7 +18,7 @@ args=(
     -fsSL
     -H "Title: $title"
     -H "Priority: $priority"
-    -d "$message"
+    --data-raw "$message"
 )
 
 if [ -n "$tags" ]; then

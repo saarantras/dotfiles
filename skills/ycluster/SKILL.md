@@ -27,6 +27,16 @@ This works on login nodes and compute nodes alike. `hostname` alone is not relia
 6. Prefer cluster-native names and defaults over generic Slurm advice.
 7. After submitting with `sbatch`, wait briefly and check whether the job fails immediately. For longer-running follow-ups, use the Lindy polling helper (see below) instead of hand-picking sleep intervals.
 
+## Know your own allocation
+
+Check whether you are running inside a Slurm allocation before doing heavy work. If `$SLURM_JOB_ID` is set, you are in a job. Inspect your own resources with `scontrol show job $SLURM_JOB_ID` (CPUs, memory, timelimit, partition, nodelist) or read the env directly (`$SLURM_CPUS_PER_TASK`, `$SLURM_MEM_PER_NODE`, `$SLURM_TIMELIMIT`).
+
+Offload work that is too large for your allocation - or that should run asynchronously - to `sbatch`. Do not monopolize your own job's CPUs and memory on subprocesses that could be separate jobs.
+
+## Submitting scripts
+
+Do not use `dirname "$0"` to locate a script when submitting it. `cd` to the directory and submit it from there.
+
 ## Python / conda environments
 
 On Yale clusters, `conda` is not available by default. Load it with:
@@ -48,7 +58,7 @@ After loading, `conda activate <env>` and `conda create` work as expected. This 
 
 ## Polling a running job (Lindy heuristic)
 
-For waits longer than a few seconds, use the `cron` skill (per global guideline) rather than `sleep`. To pick the next-poll interval, do NOT compute it yourself - call `job-lindy <jobid>` (installed at `~/.local/bin/job-lindy`, source: `dotfiles/scripts/job-lindy.sh`). It does all the work and prints `eval`-safe `key="value"` lines.
+To pick the next-poll interval, do NOT compute it yourself - call `job-lindy <jobid>` (installed at `~/.local/bin/job-lindy`, source: `dotfiles/scripts/job-lindy.sh`). It does all the work and prints `eval`-safe `key="value"` lines.
 
 ```bash
 eval "$(job-lindy 12345)"
@@ -61,7 +71,7 @@ echo "$summary"
 Loop logic:
 1. Run `job-lindy $JOBID`, eval the output.
 2. If `$terminal == 1`, stop and report `$summary` plus `.out`/`.err` tail.
-3. Otherwise schedule the next check via cron with delay `$next_poll_seconds`.
+3. Otherwise schedule the next check after `$next_poll_seconds`.
 
 The script encodes the schedule (so future edits go in one place):
 

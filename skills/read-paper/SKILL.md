@@ -5,39 +5,39 @@ description: Use when the user wants you to read, summarize, or extract informat
 
 # read-paper
 
-## Getting the PDF
+## Getting the paper
 
-**Do not try to WebFetch paywalled papers.** Agents hang or get redirected to login pages. Instead, give the user the URL and let them download it.
+Fetch open-access sources directly - arXiv (use the `/pdf/` URL), PubMed Central, bioRxiv and medRxiv (`.full.pdf`), PLoS, eLife, and journal article pages that render without a login.
 
-Paywalled by default -- give the user the URL, do not fetch:
-- Elsevier / ScienceDirect (sciencedirect.com, linkinghub.elsevier.com)
-- Nature / Springer (nature.com, link.springer.com) -- unless the URL contains `/articles/` and the paper looks open-access
-- Cell Press (cell.com)
-- Wiley (onlinelibrary.wiley.com)
-- Annual Reviews (annualreviews.org)
+For anything paywalled, ask. The user has institutional access and a download costs them about 20 seconds. Make it cheap for them: give a direct website or PDF link, not a title to go search for, and batch every paper you need into a single request rather than asking one at a time.
 
-Free to fetch directly:
-- arXiv (arxiv.org/pdf/...) -- use the /pdf/ URL, not the abstract page
-- PubMed Central (ncbi.nlm.nih.gov/pmc/...)
-- bioRxiv / medRxiv (biorxiv.org, medrxiv.org) -- use the .full.pdf URL
-- PLoS journals (journals.plos.org)
-- eLife (elifesciences.org)
-
-When in doubt, give the user the URL rather than hanging on a fetch.
-
-### Asking the user to download
-
-Give them the exact URL and a clear instruction:
 ```
-Please download this and drop the path here (or just drag the file in):
-  https://...
+Please grab these and drop the paths here (or drag the files in):
+  1. https://...
+  2. https://...
 ```
 
-Wait. Do not proceed until the PDF path is provided.
+Then wait. Do not summarize from metadata while waiting.
+
+## Say what you actually read
+
+An abstract, a PubMed record, a preprint landing page, or a search-result snippet is not the paper. Track which one you have, and say so.
+
+Never present a sample size, effect size, statistical test, or methodological detail as the paper's when it came from an abstract. If a claim rests on partial access, flag it and offer the link: "the abstract reports X, but I have not seen the methods - want me to give you the link?" beats a confident summary assembled from metadata. The user would much rather spend 20 seconds downloading than act on something wrong.
+
+This applies to absence too. Do not conclude a paper omits a control, a dataset, or an analysis when all you have seen is its abstract.
+
+## Preprints and published versions
+
+A preprint is not the final paper - numbers, figures, and conclusions routinely change in peer review.
+
+bioRxiv and medRxiv flag this on the abstract page ("Now published in <journal> doi:..."). Check for it. If a published version exists, say so and offer to have the user pull it, since they usually can.
+
+Use discretion. A recent or genuinely unpublished preprint is fine to work from, as is a preprint when the question is about something peer review would not have touched. Just do not present preprint results as settled literature, and do not assume the preprint is current when a published version exists.
 
 ## Reading the PDF
 
-For simple reading and summarization, use the built-in Read tool directly on the PDF path -- it handles PDFs natively without any extra tooling.
+For simple reading and summarization, use the built-in Read tool directly on the PDF path - it handles PDFs natively without any extra tooling.
 
 For programmatic/batch extraction (e.g. pulling tables, figures, bulk text from many files), use a Python PDF environment (see below).
 
@@ -54,8 +54,8 @@ conda env list
 Look for names like `pdf`, `paper`, `lit`, `reading`, `pdftools`, `papers`. Check if it has PDF packages:
 
 ```bash
-conda run -n <candidate> python -c "import fitz; print('pymupdf ok')" 2>/dev/null
-conda run -n <candidate> python -c "import pdfplumber; print('pdfplumber ok')" 2>/dev/null
+conda run -n <candidate> python -c "import fitz; print('pymupdf ok')"
+conda run -n <candidate> python -c "import pdfplumber; print('pdfplumber ok')"
 ```
 
 Use the first one that works.
@@ -66,7 +66,7 @@ Use the first one that works.
 conda create -n pdf-tools -y python=3.11 pymupdf pdfplumber
 ```
 
-`pymupdf` (import as `fitz`) is the workhorse -- fast, handles most PDFs well. `pdfplumber` is better for tables.
+`pymupdf` (import as `fitz`) is the workhorse - fast, handles most PDFs well. `pdfplumber` is better for tables.
 
 ### Typical extraction snippet
 
