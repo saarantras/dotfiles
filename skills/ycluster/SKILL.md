@@ -48,7 +48,7 @@ After loading, `conda activate <env>` and `conda create` work as expected. This 
 
 ## Polling a running job (Lindy heuristic)
 
-For waits longer than a few seconds, use the `cron` skill (per global guideline) rather than `sleep`. To pick the next-poll interval, do NOT compute it yourself - call `job-lindy <jobid>` (installed at `~/.local/bin/job-lindy`, source: `dotfiles/scripts/job-lindy.sh`). It does all the work and prints `eval`-safe `key="value"` lines.
+To pick the next-poll interval, do NOT compute it yourself - call `job-lindy <jobid>` (installed at `~/.local/bin/job-lindy`, source: `dotfiles/scripts/job-lindy.sh`). It does all the work and prints `eval`-safe `key="value"` lines.
 
 ```bash
 eval "$(job-lindy 12345)"
@@ -61,7 +61,7 @@ echo "$summary"
 Loop logic:
 1. Run `job-lindy $JOBID`, eval the output.
 2. If `$terminal == 1`, stop and report `$summary` plus `.out`/`.err` tail.
-3. Otherwise schedule the next check via cron with delay `$next_poll_seconds`.
+3. Otherwise schedule the next check after `$next_poll_seconds`.
 
 The script encodes the schedule (so future edits go in one place):
 
