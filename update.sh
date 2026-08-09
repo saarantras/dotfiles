@@ -31,6 +31,20 @@ if [ -f scripts/diff-highlight.sh ]; then
     chmod 755 ~/.local/bin/diff-highlight
 fi
 
+mkdir -p ~/.ssh/cm ~/.ssh/config.d
+chmod 700 ~/.ssh ~/.ssh/cm ~/.ssh/config.d
+if [ -f .ssh/config.d/ycrc ]; then
+    cp .ssh/config.d/ycrc ~/.ssh/config.d/ycrc
+    chmod 600 ~/.ssh/config.d/ycrc
+    touch ~/.ssh/config
+    chmod 600 ~/.ssh/config
+    if ! grep -qx 'Include config.d/\*' ~/.ssh/config; then
+        printf 'Include config.d/*\n\n' | cat - ~/.ssh/config > ~/.ssh/config.new \
+            && mv ~/.ssh/config.new ~/.ssh/config
+        chmod 600 ~/.ssh/config
+    fi
+fi
+
 mkdir -p ~/.emacs.d/
 cp init.el ~/.emacs.d/init.el
 
