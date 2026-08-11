@@ -15,7 +15,35 @@ Identify which cluster the user is on:
 scontrol show config 2>/dev/null | awk '/^ClusterName/{print $3}'
 ```
 
-This works on login nodes and compute nodes alike. `hostname` alone is not reliable because compute node names (e.g. `c01n05`) do not encode the cluster. If `scontrol` is unavailable or returns nothing, ask the user which cluster before proceeding.
+This works on login nodes and compute nodes alike. `hostname` alone is not reliable because compute node names (e.g. `c01n05`) do not encode the cluster. If `scontrol` returns nothing, you are running locally, not on a cluster - see below for how to reach one.
+
+## Working from a local session
+
+When `scontrol` is absent you are on the user's laptop or workstation. You can still reach the clusters over ssh, but **every fresh connection requires interactive Duo confirmation - a push notification the user has to physically approve on their phone.** Piggy-backing on an already-authenticated connection avoids that entirely, and is strongly preferred: it costs the user nothing and needs no interaction.
+
+Check for a live master before connecting:
+
+```bash
+ssh -O check bouchet.ycrc.yale.edu
+```
+
+- `Master running (pid=NNNN)` - a session is already authenticated. Run commands freely; they reuse that connection and cost no authentication.
+- `No such file or directory` - no master. **The next connection triggers a Duo push to the user's phone.** Ask before opening one rather than firing an unexpected prompt at them.
+
+With a master live, run remote commands normally:
+
+```bash
+ssh bouchet.ycrc.yale.edu 'mydirectories'
+ssh bouchet.ycrc.yale.edu 'bash -s' <<'EOF'
+squeue -u "$USER"
+EOF
+```
+
+The master persists 8h after the last client exits. After a network change the socket can go stale and connections hang; `ssh -O exit <host>` drops it. Config lives in `dotfiles/.ssh/config.d/ycrc`, and its `Host` patterns lead with `*` so specific login nodes (`login2.mccleary.ycrc.yale.edu`) multiplex as well as the round-robin names.
+
+Multiplexing is only established when the master connection is opened, so a session started before the config existed has no socket and cannot be adopted after the fact. If `ssh -O check` fails on a host the user says they are logged into, that is usually why - ask them to reconnect rather than opening a second authenticated session yourself.
+
+Remember that a login node is shared. Heavy work belongs in `sbatch`, not in an ssh one-liner.
 
 ## Workflow
 
@@ -32,6 +60,40 @@ This works on login nodes and compute nodes alike. `hostname` alone is not relia
 Check whether you are running inside a Slurm allocation before doing heavy work. If `$SLURM_JOB_ID` is set, you are in a job. Inspect your own resources with `scontrol show job $SLURM_JOB_ID` (CPUs, memory, timelimit, partition, nodelist) or read the env directly (`$SLURM_CPUS_PER_TASK`, `$SLURM_MEM_PER_NODE`, `$SLURM_TIMELIMIT`).
 
 Offload work that is too large for your allocation - or that should run asynchronously - to `sbatch`. Do not monopolize your own job's CPUs and memory on subprocesses that could be separate jobs.
+
+## Storage
+
+The two clusters use different filesystems *and* different group names - `pi_skr2` on Bouchet, `reilly` on McCleary. Never carry a path from one to the other. `mydirectories` prints the canonical paths and `getquota` the live limits; prefer running them over trusting this table if anything looks off.
+
+**Bouchet** (Roberts filesystem, successor to Gibbs/Palmer):
+
+| Tier | Full path | Shortcut | Group quota | Backup | Purge |
+|---|---|---|---|---|---|
+| home | `/nfs/roberts/home/mcn26` | `~` | 125 GiB / 500k files (personal) | Yes | No |
+| project | `/nfs/roberts/project/pi_skr2/mcn26` | `~/project_pi_skr2` | 4 TiB / 5M files | Yes | No |
+| scratch | `/nfs/roberts/scratch/pi_skr2/mcn26` | `~/scratch_pi_skr2` | 10 TiB / 15M files | No | **30 days** |
+| PI long-term | `/nfs/roberts/pi/pi_skr2` | none | 10 TiB / 10M files | No | No |
+
+The Bouchet shortcuts point at the *group* root; the user's own directory is one level deeper under `mcn26`.
+
+**McCleary** (Palmer + Gibbs; being decommissioned through 2026 into early 2027):
+
+| Tier | Full path | Shortcut | Group quota | Backup | Purge |
+|---|---|---|---|---|---|
+| home | `/vast/palmer/home.mccleary/mcn26` | `~` | 125 GiB / 500k files (personal) | Yes | No |
+| project | `/gpfs/gibbs/project/reilly/mcn26` | `~/project` | 4 TiB / 5M files | Yes | No |
+| scratch60 | `/vast/palmer/scratch/reilly/mcn26` | `~/palmer_scratch` | 10 TiB / 15M files | No | **60 days** |
+| PI long-term | `/vast/palmer/pi/reilly` | `~/varef` (points at `VariantEffects/`) | 20 TiB / 10M files | No | No |
+| YCGA work | `/gpfs/ycga/work/reilly/mcn26` | `~/ycga_work` | 4 TiB / 5M files | Yes | No |
+
+Choosing a tier:
+
+- **scratch** for job working directories and intermediates. Largest and fastest, but purged, so nothing there is safe to leave. Extending expiration artificially is against YCRC policy.
+- **project** for inputs, results, and anything worth keeping. Backed up on both clusters.
+- **PI long-term** for finished datasets that must persist and are too large for project. Not backed up - it is capacity, not safety.
+- **home** for configs and small scripts only. It is a personal quota, so filling it blocks only the user, but it is small.
+
+Watch the **file count** limits as closely as the byte limits - pipelines that write many small files hit those first. Bouchet project was at 84% of its file limit when this was written.
 
 ## Submitting scripts
 
