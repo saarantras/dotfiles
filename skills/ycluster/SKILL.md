@@ -63,7 +63,7 @@ Offload work that is too large for your allocation - or that should run asynchro
 
 ## Storage
 
-The two clusters use different filesystems *and* different group names - `pi_skr2` on Bouchet, `reilly` on McCleary. Never carry a path from one to the other. `mydirectories` prints the canonical paths and `getquota` the live limits; prefer running them over trusting this table if anything looks off.
+The two clusters use different filesystems *and* different group names - `pi_skr2` on Bouchet, `reilly` on McCleary. Never carry a path from one to the other. `mydirectories` prints the canonical paths and `getquota` the live limits; prefer running them over trusting this table if anything looks off. `getquota` is a heavy query against the filesystem - run it once and reuse the answer, never in a loop (see below).
 
 **Bouchet** (Roberts filesystem, successor to Gibbs/Palmer):
 
@@ -118,6 +118,18 @@ After loading, `conda activate <env>` and `conda create` work as expected. This 
 - If the request is underspecified, ask only for the missing job characteristics that materially affect partition choice: runtime, CPU count, memory, GPU type/count, and whether the workload is tightly-coupled MPI.
 - After `sbatch`, it is usually worth waiting briefly, then checking queue state or output files to catch immediate failures such as bad paths, invalid accounts, missing modules, or impossible resource requests.
 
+## Don't hammer shared services
+
+`squeue`, `sacct`, `getquota`, and `getusage` all hit a shared resource - the Slurm controller or the filesystem metadata servers - on behalf of every user on the cluster. Frequent polling degrades it for everyone and can get an account rate-limited.
+
+**One minute is a hard floor, and a few minutes is the sensible default.** Rules of thumb:
+
+- `getquota` and `getusage` are heavy filesystem/accounting queries. Run once, reuse the answer, and do not re-run within a few minutes. Never in a loop.
+- Broad `squeue`/`sacct` queries (whole queue, whole account, long history) are the same - a few minutes minimum.
+- Query once and reuse the result rather than re-running it for each thing you want to know, and prefer one call to several narrow ones.
+- Watching a single known job right after submission is the one case that justifies the 1 min floor, since a `squeue -j <jobid>` lookup is cheap and startup failures show up fast. Use the Lindy schedule below for that rather than inventing your own loop.
+- Never wrap any of these in a `while` loop with a short `sleep`.
+
 ## Polling a running job (Lindy heuristic)
 
 To pick the next-poll interval, do NOT compute it yourself - call `job-lindy <jobid>` (installed at `~/.local/bin/job-lindy`, source: `dotfiles/scripts/job-lindy.sh`). It does all the work and prints `eval`-safe `key="value"` lines.
@@ -139,15 +151,15 @@ The script encodes the schedule (so future edits go in one place):
 
 | Job age | Next poll | Why |
 |---|---|---|
-| PENDING | 15 s | Queue usually drains quickly here |
-| R, <2 min | 30 s | Bad path / account / module - fails fast |
+| PENDING | 1 min | Queue usually drains quickly here |
+| R, <2 min | 1 min | Bad path / account / module - fails fast |
 | R, 2-10 min | 2 min | Early OOM, I/O, module-load failures |
 | R, 10-60 min | 10 min | Settled into compute |
 | R, 1-6 h | 30 min | Stable; spot-check |
 | R, 6+ h | 60 min (cap) | Strong Lindy - likely runs to completion |
 | terminal | 0 | Stop |
 
-While in `R`, the next interval is also capped at `max(remaining_walltime/4, 30s)` so polling doesn't sleep past the job's end.
+1 min is the floor everywhere - nothing in the schedule polls faster than that. While in `R`, the next interval is also capped at `max(remaining_walltime/4, 60s)` so polling doesn't sleep past the job's end.
 
 ## Checking Priority Tier spending
 
