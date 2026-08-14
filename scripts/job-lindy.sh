@@ -7,14 +7,17 @@
 #       next_poll_human, terminal, exit_code, summary.
 #
 # Lindy schedule (RUNNING):
-#   <2m  -> 30s    (startup fragility)
+#   <2m  -> 1m     (startup fragility)
 #   <10m -> 2m     (early OOM / module / I/O failures)
 #   <1h  -> 10m
 #   <6h  -> 30m
 #   else -> 1h    (cap)
-# PENDING -> 15s flat (queue usually drains quickly).
+# PENDING -> 1m flat (queue usually drains quickly).
 # Terminal states -> 0 (stop polling).
-# Wall-time cap: next_poll <= max(remaining/4, 30s) when in RUNNING.
+# Wall-time cap: next_poll <= max(remaining/4, 60s) when in RUNNING.
+#
+# 1m is the floor everywhere: squeue hits the shared Slurm controller, and
+# polling it faster than that is rude to the scheduler and to other users.
 
 set -euo pipefail
 
@@ -110,7 +113,7 @@ esac
 
 lindy_running() {
     local e="$1"
-    if   (( e < 120 ));   then echo 30
+    if   (( e < 120 ));   then echo 60
     elif (( e < 600 ));   then echo 120
     elif (( e < 3600 ));  then echo 600
     elif (( e < 21600 )); then echo 1800
@@ -122,12 +125,12 @@ next=0
 if (( terminal )); then
     next=0
 elif [[ "$state" == "PD" ]]; then
-    next=15
+    next=60
 elif [[ "$state" == "R" ]]; then
     next=$(lindy_running "${elapsed_s:-0}")
     if [[ -n "$remaining_s" && "$remaining_s" -gt 0 ]]; then
         cap=$(( remaining_s / 4 ))
-        (( cap < 30 )) && cap=30
+        (( cap < 60 )) && cap=60
         (( next > cap )) && next=$cap
     fi
 else
