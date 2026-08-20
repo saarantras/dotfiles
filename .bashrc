@@ -246,7 +246,7 @@ claude() {
     case "$(hostname)" in
         *mccleary*|*bouchet*)
             if [ -z "${SLURM_JOB_ID:-}" ]; then
-                echo "claude: refusing to start on cluster login node. Get an allocation first (e.g. 'himottle' or 'srun --pty ...')." >&2
+                echo "claude: refusing to start on cluster login node. Get an allocation first (e.g. 'himottle 3d' or 'srun --pty ...')." >&2
                 return 1
             fi
             ;;
@@ -254,25 +254,42 @@ claude() {
     command claude "$@"
 }
 
+# Interactive allocation. Fixed at 1 cpu / 4G; only the walltime varies.
+# Bare invocation lists the durations rather than picking one.
 himottle() {
-    local days="${1:-3}"
-    local mem="${2:-8G}"
-    local cpus=1
-    local time="${days}-00:00:00"
+    local cpus=1 mem=4G
+    local spec="${1:-}" time
+    case "$spec" in
+        5h) time="05:00:00"   ;;
+        3d) time="3-00:00:00" ;;
+        7d) time="7-00:00:00" ;;
+        *)
+            [ -n "$spec" ] && echo "himottle: unknown duration '${spec}'" >&2
+            cat <<EOF
+himottle: interactive allocation, ${cpus} cpu / ${mem}
+
+  himottle 5h    5 hours
+  himottle 3d    3 days
+  himottle 7d    7 days
+EOF
+            if [ -n "$spec" ]; then return 2; fi
+            return 0
+            ;;
+    esac
     local cluster
     cluster="$(scontrol show config 2>/dev/null | awk '/^ClusterName/{print $3}')"
 
     case "$cluster" in
         mccleary)
-            echo "Spinning up on McCleary (ycga): ${days}d ${cpus}c ${mem}"
+            echo "Spinning up on McCleary (ycga): ${spec} ${cpus}c ${mem}"
             srun --pty -p ycga -t "$time" -c "$cpus" --mem="$mem" bash
             ;;
         bouchet)
-            echo "Spinning up on Bouchet (priority/prio_skr2): ${days}d ${cpus}c ${mem}"
+            echo "Spinning up on Bouchet (priority/prio_skr2): ${spec} ${cpus}c ${mem}"
             srun --pty -p priority -A prio_skr2 -t "$time" -c "$cpus" --mem="$mem" bash
             ;;
         *)
-            echo "himottle: could not determine cluster (scontrol returned '${cluster}')"
+            echo "himottle: could not determine cluster (scontrol returned '${cluster}')" >&2
             return 1
             ;;
     esac
