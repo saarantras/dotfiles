@@ -109,6 +109,8 @@ module load miniconda
 
 After loading, `conda activate <env>` and `conda create` work as expected. This applies to both interactive sessions and sbatch scripts.
 
+Some environments are packed with haversack: their directory holds `NOT-MOUNTED.txt`, and their programs exit 127 saying the environment "is packed but not mounted". In sbatch scripts run those through `haversack exec <env> -- <command>`, never `haversack mount`; that needs no `module load miniconda` unless the command itself calls conda. The haversack skill has the rest.
+
 ## Yale-specific rules
 
 - Treat `ycga` as a McCleary partition for YCGA-related jobs.
