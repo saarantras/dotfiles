@@ -254,10 +254,10 @@ claude() {
     command claude "$@"
 }
 
-# Interactive allocation. Fixed at 1 cpu / 4G; only the walltime varies.
+# Interactive allocation. Fixed at 1 cpu / 8G; only the walltime varies.
 # Bare invocation lists the durations rather than picking one.
 himottle() {
-    local cpus=1 mem=4G
+    local cpus=1 mem=8G
     local spec="${1:-}" time
     case "$spec" in
         5h) time="05:00:00"   ;;
