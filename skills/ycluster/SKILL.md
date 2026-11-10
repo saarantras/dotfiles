@@ -72,7 +72,7 @@ The two clusters use different filesystems *and* different group names - `pi_skr
 | home | `/nfs/roberts/home/mcn26` | `~` | 125 GiB / 500k files (personal) | Yes | No |
 | project | `/nfs/roberts/project/pi_skr2/mcn26` | `~/project_pi_skr2` | 4 TiB / 5M files | Yes | No |
 | scratch | `/nfs/roberts/scratch/pi_skr2/mcn26` | `~/scratch_pi_skr2` | 10 TiB / 15M files | No | **30 days** |
-| PI long-term | `/nfs/roberts/pi/pi_skr2` | none | 10 TiB / 10M files | No | No |
+| PI long-term | `/gpfs/boyd/pi/pi_skr2` | none | 10 TiB / 10M files | No | No |
 
 The Bouchet shortcuts point at the *group* root; the user's own directory is one level deeper under `mcn26`.
 
