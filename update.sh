@@ -19,8 +19,6 @@ if [ -f scripts/scratch-check.sh ]; then
     cp scripts/scratch-check.sh ~/.local/bin/scratch-check
     chmod 755 ~/.local/bin/scratch-check
 fi
-# TODO: remove once every machine has run update.sh since job-lindy was dropped.
-rm -f ~/.local/bin/job-lindy
 if [ -f scripts/tsv2md.sh ]; then
     cp scripts/tsv2md.sh ~/.local/bin/tsv2md
     chmod 755 ~/.local/bin/tsv2md
