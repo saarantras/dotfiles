@@ -1,3 +1,4 @@
+cd "$(dirname "$0")" || exit 1
 git pull > /dev/null
 cp .bashrc ~
 cp .logsort.py ~
@@ -54,14 +55,29 @@ cp .tmux.conf ~/.tmux.conf
 cp AIGUIDE.md ~/.claude/CLAUDE.md
 cp AIGUIDE.md ~/.codex/AGENTS.md
 
+# Merge managed keys into Claude settings without clobbering machine-local ones.
+if ! command -v jq >/dev/null 2>&1; then
+    echo "update.sh: WARNING: jq not found, Claude settings not merged" >&2
+else
+    [ -f ~/.claude/settings.json ] || echo '{}' > ~/.claude/settings.json
+    jq '.idleCompaction = false' ~/.claude/settings.json > ~/.claude/settings.json.new \
+        && mv ~/.claude/settings.json.new ~/.claude/settings.json
+    chmod 600 ~/.claude/settings.json
+fi
+
 mkdir -p ~/.codex/skills ~/.claude/skills
-if command -v rsync >/dev/null 2>&1 && [ -d skills ]; then
+# .system/ is Codex's bundled skills; synced/ is Claude's claude.ai-synced skills.
+if ! command -v rsync >/dev/null 2>&1; then
+    echo "update.sh: WARNING: rsync not found, skills not synced" >&2
+elif [ -d skills ]; then
     rsync -a --delete \
         --exclude '.system/' \
+        --exclude 'synced/' \
         --exclude '.gitkeep' \
         skills/ ~/.codex/skills/
     rsync -a --delete \
         --exclude '.system/' \
+        --exclude 'synced/' \
         --exclude '.gitkeep' \
         skills/ ~/.claude/skills/
 fi
