@@ -37,13 +37,13 @@ Use discretion. A recent or genuinely unpublished preprint is fine to work from,
 
 ## Reading the PDF
 
-For simple reading and summarization, use the built-in Read tool directly on the PDF path - it handles PDFs natively without any extra tooling.
+For simple reading and summarization, use your file-reading tool directly on the PDF path if it handles PDFs natively. If it does not, `pdftotext -layout` (poppler) is the quickest fallback, then the Python environment below.
 
 For programmatic/batch extraction (e.g. pulling tables, figures, bulk text from many files), use a Python PDF environment (see below).
 
 ## Python PDF environment
 
-Only needed for programmatic extraction, not for simple reading.
+Only needed for programmatic extraction, or for simple reading when neither a native PDF reader nor pdftotext is available.
 
 ### Find an existing env
 

@@ -1,6 +1,6 @@
 ---
 name: ycluster
-description: Use when the user is writing, debugging, or reviewing Slurm sbatch or salloc commands for Yale YCRC clusters, especially Bouchet and McCleary, including partition selection, YCGA usage, Priority Tier account selection such as prio_skr2, and Yale-specific resource defaults.
+description: Use when the user is writing, debugging, or reviewing Slurm sbatch or salloc commands for Yale YCRC clusters, especially Bouchet and McCleary, including partition selection, YCGA usage, Priority Tier account selection such as prio_skr2, and Yale-specific resource defaults. Also use when ssh-ing to a cluster from a laptop (Duo, connection piggybacking) or moving commands and data between Bouchet and McCleary.
 ---
 
 # ycluster
@@ -15,7 +15,14 @@ Identify which cluster the user is on:
 scontrol show config 2>/dev/null | awk '/^ClusterName/{print $3}'
 ```
 
-This works on login nodes and compute nodes alike. `hostname` alone is not reliable because compute node names (e.g. `c01n05`) do not encode the cluster. If `scontrol` returns nothing, you are running locally, not on a cluster - see below for how to reach one.
+This works on login nodes and compute nodes alike. `hostname` alone is not reliable because compute node names (e.g. `c01n05`) do not encode the cluster. If `scontrol` returns nothing, you are running locally, not on a cluster.
+
+Where you are decides how you reach the other machines:
+
+| You are on | Reaching a cluster | Section |
+|---|---|---|
+| Laptop / workstation (no `scontrol`) | Every fresh ssh costs the user a Duo push - piggyback on a live master | [Working from a local session](#working-from-a-local-session) |
+| Bouchet or McCleary (login or compute node) | ssh to the other cluster works with no Duo - just hop | [Hopping between clusters](#hopping-between-clusters) |
 
 ## Working from a local session
 
@@ -45,6 +52,24 @@ Multiplexing is only established when the master connection is opened, so a sess
 
 Remember that a login node is shared. Heavy work belongs in `sbatch`, not in an ssh one-liner.
 
+## Hopping between clusters
+
+None of the Duo caution above applies once you are already on a cluster. Cluster-to-cluster ssh has no Duo gate in either direction, from login and compute nodes alike, so when a task needs the other cluster - checking a job, reading a file, copying results - just ssh across without asking:
+
+```bash
+ssh bouchet.ycrc.yale.edu 'squeue -u "$USER"'
+rsync -a ~/palmer_scratch/run1/results/ bouchet.ycrc.yale.edu:/nfs/roberts/scratch/pi_skr2/mcn26/run1/
+```
+
+Add `-o BatchMode=yes` in scripts and batch jobs. The hop is key-based, so it never needs a prompt; if keys ever break, BatchMode makes ssh fail immediately instead of hanging on a password prompt nobody is watching. If it fails, tell the user rather than retrying.
+
+When hopping:
+
+- **Translate paths.** The clusters have different filesystems, home directories, and group names (see [Storage](#storage)). A path from one cluster is meaningless on the other; `~` on each side is a different directory.
+- **The remote side is a login node.** Same rule as above - quick queries and transfers only, real work goes through `sbatch` on that cluster.
+- **Polling limits apply per cluster.** Querying the other cluster's `squeue` over ssh still hits its controller - the [rate rules](#dont-hammer-shared-services) hold.
+- **Bulk data.** rsync is fine for results-sized transfers. For large trees, Globus is the better tool (see the dump-to-scriptorium skill for the pattern).
+
 ## Workflow
 
 1. Check whether the job is for `sbatch`, `salloc`, or a shell one-liner.
@@ -53,7 +78,7 @@ Remember that a login node is shared. Heavy work belongs in `sbatch`, not in an 
 4. Choose the account from [`references/accounts-and-patterns.md`](references/accounts-and-patterns.md).
 5. Write a minimal script with only the resources the job actually needs.
 6. Prefer cluster-native names and defaults over generic Slurm advice.
-7. After submitting with `sbatch`, wait briefly and check whether the job fails immediately. For longer-running follow-ups, use the Lindy polling helper (see below) instead of hand-picking sleep intervals.
+7. After submitting with `sbatch`, check at small increments during startup to catch immediate failures, but stop polling once the job is past startup - repeated checks are rough on the scheduler.
 
 ## Know your own allocation
 
@@ -118,7 +143,6 @@ Some environments are packed with haversack: their directory holds `NOT-MOUNTED.
 - When using a Priority Tier account, pair it with a Priority Tier partition such as `priority`, `priority_gpu`, or `priority_mpi` where supported.
 - If the user asks for the "right partition", recommend the smallest suitable partition first, then mention faster or larger alternatives only if warranted.
 - If the request is underspecified, ask only for the missing job characteristics that materially affect partition choice: runtime, CPU count, memory, GPU type/count, and whether the workload is tightly-coupled MPI.
-- After `sbatch`, it is usually worth waiting briefly, then checking queue state or output files to catch immediate failures such as bad paths, invalid accounts, missing modules, or impossible resource requests.
 
 ## Don't hammer shared services
 
@@ -129,39 +153,8 @@ Some environments are packed with haversack: their directory holds `NOT-MOUNTED.
 - `getquota` and `getusage` are heavy filesystem/accounting queries. Run once, reuse the answer, and do not re-run within a few minutes. Never in a loop.
 - Broad `squeue`/`sacct` queries (whole queue, whole account, long history) are the same - a few minutes minimum.
 - Query once and reuse the result rather than re-running it for each thing you want to know, and prefer one call to several narrow ones.
-- Watching a single known job right after submission is the one case that justifies the 1 min floor, since a `squeue -j <jobid>` lookup is cheap and startup failures show up fast. Use the Lindy schedule below for that rather than inventing your own loop.
+- Watching a single known job right after submission is the one case that justifies the 1 min floor, since a `squeue -j <jobid>` lookup is cheap and startup failures show up fast. Past startup, stop polling.
 - Never wrap any of these in a `while` loop with a short `sleep`.
-
-## Polling a running job (Lindy heuristic)
-
-To pick the next-poll interval, do NOT compute it yourself - call `job-lindy <jobid>` (installed at `~/.local/bin/job-lindy`, source: `dotfiles/scripts/job-lindy.sh`). It does all the work and prints `eval`-safe `key="value"` lines.
-
-```bash
-eval "$(job-lindy 12345)"
-echo "$summary"
-# $next_poll_seconds: integer seconds until next check (0 if terminal)
-# $terminal:          "1" if job is finished/failed/cancelled/etc.
-# $state:             short code (PD, R, CD, F, CA, TO, OOM, ...)
-```
-
-Loop logic:
-1. Run `job-lindy $JOBID`, eval the output.
-2. If `$terminal == 1`, stop and report `$summary` plus `.out`/`.err` tail.
-3. Otherwise schedule the next check after `$next_poll_seconds`.
-
-The script encodes the schedule (so future edits go in one place):
-
-| Job age | Next poll | Why |
-|---|---|---|
-| PENDING | 1 min | Queue usually drains quickly here |
-| R, <2 min | 1 min | Bad path / account / module - fails fast |
-| R, 2-10 min | 2 min | Early OOM, I/O, module-load failures |
-| R, 10-60 min | 10 min | Settled into compute |
-| R, 1-6 h | 30 min | Stable; spot-check |
-| R, 6+ h | 60 min (cap) | Strong Lindy - likely runs to completion |
-| terminal | 0 | Stop |
-
-1 min is the floor everywhere - nothing in the schedule polls faster than that. While in `R`, the next interval is also capped at `max(remaining_walltime/4, 60s)` so polling doesn't sleep past the job's end.
 
 ## Checking Priority Tier spending
 

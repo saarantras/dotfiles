@@ -1,6 +1,6 @@
 ---
 name: ntfy-notify
-description: Use when the user wants ntfy notifications, mentions notify-job, asks to be woken up by a notification, or asks Codex to add lightweight job-completion or failure notifications to a script or command workflow.
+description: Use when the user wants ntfy notifications, mentions notify-job, asks to be woken up by a notification, or asks to add lightweight job-completion or failure notifications to a script or command workflow.
 ---
 
 # ntfy Notify
@@ -67,7 +67,7 @@ Use `notify-job` in two modes:
 
 **Attached to scripts** - add notifications to a script the user is working on for completion/failure/milestone alerts.
 
-**Direct invocation by AI assistants** - Claude or other agents can call `notify-job` directly (not inside a script) to send the user a status update, milestone report, or summary message mid-task. This is especially useful for long-running agentic workflows where the user may not be watching the terminal.
+**Direct invocation by AI assistants** - agents can call `notify-job` directly (not inside a script) to send the user a status update, milestone report, or summary message mid-task. This is especially useful for long-running agentic workflows where the user may not be watching the terminal.
 
 `notify-job` is particularly well-suited for long-term monitoring: send a notification on each key milestone, on failure, and on final success. Don't limit notifications to just start/end.
 
